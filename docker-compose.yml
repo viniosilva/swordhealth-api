@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: swordhealth
+      MYSQL_ROOT_PASSWORD: R001_S3cR31
+      MYSQL_USER: user
+      MYSQL_PASSWORD: S3cR31
+    ports:
+      - 3306:3306
+    volumes:
+      - swordhealth:/var/lib/mysql
+
+volumes:
+  swordhealth:
