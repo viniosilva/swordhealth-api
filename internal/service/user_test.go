@@ -22,13 +22,13 @@ func TestUserServiceCreateUser(t *testing.T) {
 		UpdatedAt: now,
 		Username:  "username",
 		Email:     "email@email.com",
-		Password:  "1122334455",
+		Password:  "aabbccddee",
 		Role:      model.UserRoleTechnician,
 	}
 
 	var cases = map[string]struct {
 		inputData    dto.CreateUserDto
-		mocking      func(userRepository *mock.MockUserRepository)
+		mocking      func(userRepository *mock.MockUserRepository, cryptoService *mock.MockCryptoService)
 		expectedUser *model.User
 		expectedErr  error
 	}{
@@ -36,10 +36,11 @@ func TestUserServiceCreateUser(t *testing.T) {
 			inputData: dto.CreateUserDto{
 				Username: user.Username,
 				Email:    user.Email,
-				Password: user.Password,
+				Password: "1122334455",
 				Role:     user.Role,
 			},
-			mocking: func(userRepository *mock.MockUserRepository) {
+			mocking: func(userRepository *mock.MockUserRepository, cryptoService *mock.MockCryptoService) {
+				cryptoService.EXPECT().Hash(gomock.Any()).Return("aabbccddee")
 				userRepository.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(user, nil)
 			},
 			expectedUser: user,
@@ -48,9 +49,10 @@ func TestUserServiceCreateUser(t *testing.T) {
 			inputData: dto.CreateUserDto{
 				Username: user.Username,
 				Email:    user.Email,
-				Password: user.Password,
+				Password: "1122334455",
 			},
-			mocking: func(userRepository *mock.MockUserRepository) {
+			mocking: func(userRepository *mock.MockUserRepository, cryptoService *mock.MockCryptoService) {
+				cryptoService.EXPECT().Hash(gomock.Any()).Return("aabbccddee")
 				userRepository.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(user, nil)
 			},
 			expectedUser: user,
@@ -59,10 +61,11 @@ func TestUserServiceCreateUser(t *testing.T) {
 			inputData: dto.CreateUserDto{
 				Username: user.Username,
 				Email:    user.Email,
-				Password: user.Password,
+				Password: "1122334455",
 				Role:     user.Role,
 			},
-			mocking: func(userRepository *mock.MockUserRepository) {
+			mocking: func(userRepository *mock.MockUserRepository, cryptoService *mock.MockCryptoService) {
+				cryptoService.EXPECT().Hash(gomock.Any()).Return("aabbccddee")
 				userRepository.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
 					Return(nil, fmt.Errorf("error"))
 			},
@@ -77,9 +80,10 @@ func TestUserServiceCreateUser(t *testing.T) {
 			defer ctrl.Finish()
 
 			userRepositoryMock := mock.NewMockUserRepository(ctrl)
-			userService := service.NewUserService(userRepositoryMock)
+			cryptoServiceMock := mock.NewMockCryptoService(ctrl)
+			userService := service.NewUserService(userRepositoryMock, cryptoServiceMock)
 
-			cs.mocking(userRepositoryMock)
+			cs.mocking(userRepositoryMock, cryptoServiceMock)
 
 			// when
 			user, err := userService.CreateUser(ctx, cs.inputData)
@@ -98,7 +102,8 @@ func BenchmarkUserServiceCreateUser(b *testing.B) {
 	defer ctrl.Finish()
 
 	userRepositoryMock := mock.NewMockUserRepository(ctrl)
-	userService := service.NewUserService(userRepositoryMock)
+	cryptoServiceMock := mock.NewMockCryptoService(ctrl)
+	userService := service.NewUserService(userRepositoryMock, cryptoServiceMock)
 
 	now := time.Now()
 	user := &model.User{
@@ -107,10 +112,11 @@ func BenchmarkUserServiceCreateUser(b *testing.B) {
 		UpdatedAt: now,
 		Username:  "username",
 		Email:     "email@email.com",
-		Password:  "1122334455",
+		Password:  "aabbccddee",
 		Role:      model.UserRoleManager,
 	}
 
+	cryptoServiceMock.EXPECT().Hash(gomock.Any()).Return("aabbccddee")
 	userRepositoryMock.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
 		AnyTimes().Return(user, nil)
 

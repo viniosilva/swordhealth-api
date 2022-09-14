@@ -20,9 +20,14 @@ type MySQLConfig struct {
 	Database string `mapstructure:"database"`
 }
 
+type Crypto struct {
+	Key string `mapstructure:"key"`
+}
+
 type Config struct {
 	Server ServerConfig `mapstructure:"server"`
 	MySQL  MySQLConfig  `mapstructure:"mysql"`
+	Crypto Crypto       `mapstructure:"crypto"`
 }
 
 func LoadConfig() Config {
@@ -42,6 +47,7 @@ func LoadConfig() Config {
 	}
 
 	configuration.MySQL.Password = os.Getenv("MYSQL_PASSWORD")
+	configuration.Crypto.Key = os.Getenv("CRYPTO_KEY")
 
 	return configuration
 }

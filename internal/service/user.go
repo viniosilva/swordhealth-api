@@ -16,11 +16,13 @@ type UserService interface {
 
 type userService struct {
 	userRepository repository.UserRepository
+	cryptoService  CryptoService
 }
 
-func NewUserService(userRepository repository.UserRepository) UserService {
+func NewUserService(userRepository repository.UserRepository, cryptoService CryptoService) UserService {
 	return &userService{
 		userRepository: userRepository,
+		cryptoService:  cryptoService,
 	}
 }
 
@@ -29,6 +31,7 @@ func (impl *userService) CreateUser(ctx context.Context, data dto.CreateUserDto)
 		data.Role = model.UserRoleTechnician
 	}
 
+	data.Password = impl.cryptoService.Hash(data.Password)
 	user, err := impl.userRepository.CreateUser(ctx, data)
 	if err != nil {
 		log.WithFields(log.Fields{

@@ -37,8 +37,9 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	taskRepository := repository.NewTaskRepository(db)
 
+	cryptoService := service.NewCryptoService(c.Crypto.Key)
 	healthService := service.NewHealthService(healthRepository)
-	userService := service.NewUserService(userRepository)
+	userService := service.NewUserService(userRepository, cryptoService)
 	taskService := service.NewTaskService(taskRepository)
 	notificationService := service.NewNotificationService(userRepository)
 

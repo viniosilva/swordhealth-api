@@ -5,7 +5,7 @@ CREATE TABLE users (
 	deleted_at	timestamp,
 	email		varchar(250)	NOT NULL,
 	username	varchar(100)	NOT NULL,
-	password	varchar(50)		NOT NULL,
+	password	varchar(128)	NOT NULL,
 	role		varchar(20)		NOT NULL,
 	PRIMARY KEY (id)
 );
