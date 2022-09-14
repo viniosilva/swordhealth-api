@@ -26,6 +26,13 @@ func NewHealthController(router *gin.RouterGroup, healthService service.HealthSe
 	return impl
 }
 
+// @Summary healthcheck
+// @Schemes
+// @Tags health
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.HealthResponse
+// @Router /healthcheck [get]
 func (impl *healthController) Health(ctx *gin.Context) {
 	err := impl.healthService.Health(ctx)
 	if err != nil {

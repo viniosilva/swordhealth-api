@@ -8,5 +8,5 @@ const (
 )
 
 type HealthResponse struct {
-	Status HealthStatus `json:"status,omitempty"`
+	Status HealthStatus `json:"status,omitempty" example:"up"`
 }

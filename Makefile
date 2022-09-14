@@ -20,3 +20,6 @@ test/cov:
 
 migrate:
 	migrate -database ${MIGRATE_URL} -path db/migrations up
+
+swag:
+	swag init

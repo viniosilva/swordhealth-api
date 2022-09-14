@@ -1,0 +1,166 @@
+basePath: /api
+definitions:
+  dto.CreateTaskDto:
+    properties:
+      summary:
+        example: summary
+        maxLength: 2500
+        minLength: 1
+        type: string
+      user_id:
+        example: 1
+        minimum: 1
+        type: integer
+    required:
+    - summary
+    - user_id
+    type: object
+  dto.CreateUserDto:
+    properties:
+      email:
+        example: email@email.com
+        type: string
+      password:
+        example: "12345"
+        maxLength: 20
+        minLength: 4
+        type: string
+      role:
+        enum:
+        - technician
+        - manager
+        example: technician
+        type: string
+      username:
+        example: username
+        maxLength: 20
+        minLength: 4
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  dto.HealthResponse:
+    properties:
+      status:
+        example: up
+        type: string
+    type: object
+  dto.TaskDto:
+    properties:
+      created_at:
+        example: "1992-08-21 12:03:43"
+        type: string
+      id:
+        example: 1
+        type: integer
+      status:
+        example: opened
+        type: string
+      summary:
+        example: summary
+        type: string
+      updated_at:
+        example: "1992-08-21 12:03:43"
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserDto'
+    type: object
+  dto.TaskResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.TaskDto'
+    type: object
+  dto.UserDto:
+    properties:
+      created_at:
+        example: "1992-08-21 12:03:43"
+        type: string
+      deleted_at:
+        example: "1992-08-21 12:03:43"
+        type: string
+      email:
+        example: email@email.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      role:
+        example: technician
+        type: string
+      updated_at:
+        example: "1992-08-21 12:03:43"
+        type: string
+      username:
+        example: username
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UserDto'
+    type: object
+info:
+  contact: {}
+  description: Task manager test
+  title: Sword Health API
+  version: "1.0"
+paths:
+  /healthcheck:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthResponse'
+      summary: healthcheck
+      tags:
+      - health
+  /tasks:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: task
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTaskDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.TaskResponse'
+      summary: create task
+      tags:
+      - task
+  /users:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+      summary: create user
+      tags:
+      - user
+swagger: "2.0"

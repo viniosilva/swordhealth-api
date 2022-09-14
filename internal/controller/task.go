@@ -28,6 +28,14 @@ func NewTaskController(router *gin.RouterGroup, taskService service.TaskService)
 	return impl
 }
 
+// @Summary create task
+// @Schemes
+// @Tags task
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateTaskDto true "task"
+// @Success 201 {object} dto.TaskResponse
+// @Router /tasks [post]
 func (impl *taskController) CreateTask(ctx *gin.Context) {
 	var data dto.CreateTaskDto
 	err := ctx.ShouldBindJSON(&data)

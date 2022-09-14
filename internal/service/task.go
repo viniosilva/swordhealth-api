@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/viniosilva/swordhealth-api/internal/dto"
 	"github.com/viniosilva/swordhealth-api/internal/model"
 	"github.com/viniosilva/swordhealth-api/internal/repository"
@@ -27,7 +27,7 @@ func NewTaskService(taskRepository repository.TaskRepository) TaskService {
 func (impl *taskService) CreateTask(ctx context.Context, data dto.CreateTaskDto) (*model.Task, error) {
 	task, err := impl.taskRepository.CreateTask(ctx, data)
 	if err != nil {
-		fmt.Println("internal.service.task.createtask.error: ", err.Error())
+		log.WithFields(log.Fields{"error": err.Error()}).Error("internal.service.task.createtask")
 		return nil, err
 	}
 

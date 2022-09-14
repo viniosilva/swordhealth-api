@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/viniosilva/swordhealth-api/internal/dto"
 	"github.com/viniosilva/swordhealth-api/internal/model"
 	"github.com/viniosilva/swordhealth-api/internal/repository"
@@ -31,7 +31,7 @@ func (impl *userService) CreateUser(ctx context.Context, data dto.CreateUserDto)
 
 	user, err := impl.userRepository.CreateUser(ctx, data)
 	if err != nil {
-		fmt.Println("internal.service.user.createuser.error: ", err.Error())
+		log.WithFields(log.Fields{"error": err.Error()}).Error("internal.service.user.createuser")
 		return nil, err
 	}
 

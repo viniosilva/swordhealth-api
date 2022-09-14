@@ -31,6 +31,14 @@ func NewUserController(router *gin.RouterGroup, userService service.UserService)
 	return impl
 }
 
+// @Summary create user
+// @Schemes
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateUserDto true "user"
+// @Success 201 {object} dto.UserResponse
+// @Router /users [post]
 func (impl *userController) CreateUser(ctx *gin.Context) {
 	impl.RegisterValidationUserEnum()
 
