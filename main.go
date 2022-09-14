@@ -40,7 +40,7 @@ func main() {
 	healthService := service.NewHealthService(healthRepository)
 	userService := service.NewUserService(userRepository)
 	taskService := service.NewTaskService(taskRepository)
-	notificationService := service.NewNotificationService(userRepository, c.Service.Notification.SummaryLength)
+	notificationService := service.NewNotificationService(userRepository)
 
 	controller.NewHealthController(router, healthService)
 	controller.NewUserController(router, userService)

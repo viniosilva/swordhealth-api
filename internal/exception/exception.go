@@ -18,6 +18,14 @@ func (impl *ForeignKeyConstraintException) Error() string {
 	return impl.Message
 }
 
+type NotFoundException struct {
+	Message string
+}
+
+func (impl *NotFoundException) Error() string {
+	return impl.Message
+}
+
 func FormatBindingErrors(err error) string {
 	if validationErrors, ok := err.(validator.ValidationErrors); !ok {
 		return "invalid payload"

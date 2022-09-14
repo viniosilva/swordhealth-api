@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/viniosilva/swordhealth-api/internal/model"
@@ -10,22 +11,36 @@ import (
 
 //go:generate mockgen -destination=../../mock/notification_service_mock.go -package=mock . NotificationService
 type NotificationService interface {
-	NotifyAdminUserOnSaveTask(ctx context.Context, task *model.Task) error
+	NotifyAdminUserOnSaveTask(ctx context.Context, task *model.Task, actionUserID int) error
 }
 
 type notificationService struct {
 	userRepository repository.UserRepository
-	summaryLength  int
 }
 
-func NewNotificationService(userRepository repository.UserRepository, summaryLength int) NotificationService {
+func NewNotificationService(userRepository repository.UserRepository) NotificationService {
 	return &notificationService{
 		userRepository: userRepository,
-		summaryLength:  summaryLength,
 	}
 }
 
-func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, task *model.Task) error {
+func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, task *model.Task, actionUserID int) error {
+	actionUser, err := impl.userRepository.GetUserByID(ctx, actionUserID)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"trace": "internal.service.notification.notifyadminuseronsavetask",
+		}).Error(err.Error())
+		return err
+	}
+
+	if actionUser.Role == model.UserRoleManager {
+		log.WithFields(log.Fields{
+			"trace": "internal.service.notification.notifyadminuseronsavetask",
+		}).Info("does not notify when user is manager")
+
+		return nil
+	}
+
 	users, _, err := impl.userRepository.ListUsers(ctx, 0, 0, repository.SetWhere("WHERE role = ?", []interface{}{model.UserRoleManager}))
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -34,10 +49,11 @@ func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, 
 		return err
 	}
 
-	summary := task.Summary
-	if len(summary) > impl.summaryLength {
-		summary = summary[:impl.summaryLength] + "..."
-	}
+	message := fmt.Sprintf("the tech %s performed the task %d on date %s",
+		actionUser.Username,
+		task.ID,
+		task.UpdatedAt.Format("2006-01-02 15:04:05"),
+	)
 
 	for _, u := range users {
 		log.WithFields(log.Fields{
@@ -46,14 +62,7 @@ func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, 
 				"id":       u.ID,
 				"username": u.Username,
 			},
-			"task": map[string]interface{}{
-				"id":         task.ID,
-				"created_at": task.CreatedAt.Format("2006-01-02 15:04:05"),
-				"updated_at": task.UpdatedAt.Format("2006-01-02 15:04:05"),
-				"summary":    summary,
-				"status":     task.Status,
-			},
-		}).Info("notification to manager user")
+		}).Infof(message)
 	}
 
 	return nil

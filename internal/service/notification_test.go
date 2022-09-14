@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/viniosilva/swordhealth-api/internal/exception"
 	"github.com/viniosilva/swordhealth-api/internal/model"
 	"github.com/viniosilva/swordhealth-api/internal/service"
 	"github.com/viniosilva/swordhealth-api/mock"
@@ -17,55 +18,92 @@ func TestNotificationServiceNotifyAdminUserOnSaveTask(t *testing.T) {
 	now := time.Now()
 
 	var cases = map[string]struct {
-		injectSummaryLength int
-		inputTask           *model.Task
-		mocking             func(userRepository *mock.MockUserRepository)
-		expectedErr         error
+		inputTask         *model.Task
+		inputActionUserID int
+		mocking           func(userRepository *mock.MockUserRepository)
+		expectedErr       error
 	}{
 		"should notify manager users": {
-			injectSummaryLength: 30,
 			inputTask: &model.Task{
 				ID:        1,
+				UserID:    1,
 				CreatedAt: now,
 				UpdatedAt: now,
 				Summary:   "summary",
 				Status:    model.TaskStatusOpened,
 			},
+			inputActionUserID: 1,
 			mocking: func(userRepository *mock.MockUserRepository) {
+				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).
+					Return(&model.User{ID: 1, Role: model.UserRoleTechnician}, nil)
 				userRepository.EXPECT().ListUsers(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return([]model.User{
-						{ID: 1, Username: "user 1"},
 						{ID: 2, Username: "user 2"},
+						{ID: 3, Username: "user 3"},
 					}, 2, nil)
 			},
 		},
-		"should notify manager users when summary is longer than 30 characters": {
-			injectSummaryLength: 30,
+
+		"should not notify when action user is a manager": {
 			inputTask: &model.Task{
 				ID:        1,
+				UserID:    1,
 				CreatedAt: now,
 				UpdatedAt: now,
-				Summary:   "summary summary summary summary summary summary",
+				Summary:   "summary",
 				Status:    model.TaskStatusOpened,
 			},
+			inputActionUserID: 1,
 			mocking: func(userRepository *mock.MockUserRepository) {
-				userRepository.EXPECT().ListUsers(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-					Return([]model.User{
-						{ID: 1, Username: "user 1"},
-						{ID: 2, Username: "user 2"},
-					}, 2, nil)
+				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).
+					Return(&model.User{ID: 1, Role: model.UserRoleManager}, nil)
 			},
+		},
+		"should throw not found exception when user not exist ": {
+			inputTask: &model.Task{
+				ID:        1,
+				UserID:    1,
+				CreatedAt: now,
+				UpdatedAt: now,
+				Summary:   "summary",
+				Status:    model.TaskStatusOpened,
+			},
+			inputActionUserID: 1,
+			mocking: func(userRepository *mock.MockUserRepository) {
+				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).
+					Return(nil, &exception.NotFoundException{Message: "user not found"})
+			},
+			expectedErr: &exception.NotFoundException{Message: "user not found"},
+		},
+		"should throw error get user by id": {
+			inputTask: &model.Task{
+				ID:        1,
+				UserID:    1,
+				CreatedAt: now,
+				UpdatedAt: now,
+				Summary:   "summary",
+				Status:    model.TaskStatusOpened,
+			},
+			inputActionUserID: 1,
+			mocking: func(userRepository *mock.MockUserRepository) {
+				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).
+					Return(nil, fmt.Errorf("error"))
+			},
+			expectedErr: fmt.Errorf("error"),
 		},
 		"should throw error when list users": {
-			injectSummaryLength: 30,
 			inputTask: &model.Task{
 				ID:        1,
+				UserID:    1,
 				CreatedAt: now,
 				UpdatedAt: now,
 				Summary:   "summary",
 				Status:    model.TaskStatusOpened,
 			},
+			inputActionUserID: 1,
 			mocking: func(userRepository *mock.MockUserRepository) {
+				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).
+					Return(&model.User{ID: 1, Role: model.UserRoleTechnician}, nil)
 				userRepository.EXPECT().ListUsers(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil, 0, fmt.Errorf("error"))
 			},
@@ -80,12 +118,12 @@ func TestNotificationServiceNotifyAdminUserOnSaveTask(t *testing.T) {
 			defer ctrl.Finish()
 
 			userRepositoryMock := mock.NewMockUserRepository(ctrl)
-			notificationService := service.NewNotificationService(userRepositoryMock, cs.injectSummaryLength)
+			notificationService := service.NewNotificationService(userRepositoryMock)
 
 			cs.mocking(userRepositoryMock)
 
 			// when
-			err := notificationService.NotifyAdminUserOnSaveTask(ctx, cs.inputTask)
+			err := notificationService.NotifyAdminUserOnSaveTask(ctx, cs.inputTask, cs.inputActionUserID)
 
 			// then
 			assert.Equal(t, cs.expectedErr, err)
@@ -100,7 +138,7 @@ func BenchmarkNotificationServiceNotifyAdminUserOnSaveTask(b *testing.B) {
 	defer ctrl.Finish()
 
 	userRepositoryMock := mock.NewMockUserRepository(ctrl)
-	notificationService := service.NewNotificationService(userRepositoryMock, 30)
+	notificationService := service.NewNotificationService(userRepositoryMock)
 
 	userRepositoryMock.EXPECT().ListUsers(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		AnyTimes().
@@ -121,6 +159,6 @@ func BenchmarkNotificationServiceNotifyAdminUserOnSaveTask(b *testing.B) {
 
 	// when
 	for i := 0; i < b.N; i++ {
-		notificationService.NotifyAdminUserOnSaveTask(ctx, task)
+		notificationService.NotifyAdminUserOnSaveTask(ctx, task, task.UserID)
 	}
 }

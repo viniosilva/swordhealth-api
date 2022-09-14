@@ -20,18 +20,9 @@ type MySQLConfig struct {
 	Database string `mapstructure:"database"`
 }
 
-type NotificationService struct {
-	SummaryLength int `mapstructure:"summary_length"`
-}
-
-type Service struct {
-	Notification NotificationService `mapstructure:"notification"`
-}
-
 type Config struct {
-	Server  ServerConfig `mapstructure:"server"`
-	MySQL   MySQLConfig  `mapstructure:"mysql"`
-	Service Service      `mapstructure:"service"`
+	Server ServerConfig `mapstructure:"server"`
+	MySQL  MySQLConfig  `mapstructure:"mysql"`
 }
 
 func LoadConfig() Config {

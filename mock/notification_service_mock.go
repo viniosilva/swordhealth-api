@@ -36,15 +36,15 @@ func (m *MockNotificationService) EXPECT() *MockNotificationServiceMockRecorder 
 }
 
 // NotifyAdminUserOnSaveTask mocks base method.
-func (m *MockNotificationService) NotifyAdminUserOnSaveTask(arg0 context.Context, arg1 *model.Task) error {
+func (m *MockNotificationService) NotifyAdminUserOnSaveTask(arg0 context.Context, arg1 *model.Task, arg2 int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NotifyAdminUserOnSaveTask", arg0, arg1)
+	ret := m.ctrl.Call(m, "NotifyAdminUserOnSaveTask", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // NotifyAdminUserOnSaveTask indicates an expected call of NotifyAdminUserOnSaveTask.
-func (mr *MockNotificationServiceMockRecorder) NotifyAdminUserOnSaveTask(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockNotificationServiceMockRecorder) NotifyAdminUserOnSaveTask(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotifyAdminUserOnSaveTask", reflect.TypeOf((*MockNotificationService)(nil).NotifyAdminUserOnSaveTask), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotifyAdminUserOnSaveTask", reflect.TypeOf((*MockNotificationService)(nil).NotifyAdminUserOnSaveTask), arg0, arg1, arg2)
 }

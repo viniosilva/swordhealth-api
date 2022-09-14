@@ -44,8 +44,8 @@ func TestTaskControllerCreateTask(t *testing.T) {
 			}`,
 			mocking: func(taskService *mock.MockTaskService, notificationService *mock.MockNotificationService, async chan bool) {
 				taskService.EXPECT().CreateTask(gomock.Any(), gomock.Any()).Return(task, nil)
-				notificationService.EXPECT().NotifyAdminUserOnSaveTask(gomock.Any(), gomock.Any()).
-					Do(func(arg interface{}, arg2 interface{}) {
+				notificationService.EXPECT().NotifyAdminUserOnSaveTask(gomock.Any(), gomock.Any(), gomock.Any()).
+					Do(func(arg interface{}, arg2 interface{}, arg3 interface{}) {
 						async <- true
 					})
 			},

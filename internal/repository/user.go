@@ -7,12 +7,14 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/viniosilva/swordhealth-api/internal/dto"
+	"github.com/viniosilva/swordhealth-api/internal/exception"
 	"github.com/viniosilva/swordhealth-api/internal/model"
 )
 
 //go:generate mockgen -destination=../../mock/user_repository_mock.go -package=mock . UserRepository
 type UserRepository interface {
 	CreateUser(ctx context.Context, data dto.CreateUserDto) (*model.User, error)
+	GetUserByID(ctx context.Context, id int) (*model.User, error)
 	ListUsers(ctx context.Context, limit, offset int, opts ...WhereOpt) ([]model.User, int, error)
 }
 
@@ -50,6 +52,28 @@ func (impl *userRepository) CreateUser(ctx context.Context, data dto.CreateUserD
 		Email:     data.Email,
 		Role:      data.Role,
 	}, nil
+}
+
+func (impl *userRepository) GetUserByID(ctx context.Context, id int) (*model.User, error) {
+	var users []model.User
+	query := `
+		SELECT id,
+			created_at,
+			updated_at,
+			username,
+			email,
+			password,
+			role
+		FROM users
+		WHERE id = ?
+	`
+	err := impl.db.SelectContext(ctx, &users, query, id)
+
+	if len(users) == 0 {
+		return nil, &exception.NotFoundException{Message: "user not found"}
+	}
+
+	return &users[0], err
 }
 
 func (impl *userRepository) ListUsers(ctx context.Context, limit, offset int, opts ...WhereOpt) ([]model.User, int, error) {

@@ -60,7 +60,7 @@ func (impl *taskController) CreateTask(ctx *gin.Context) {
 		return
 	}
 
-	go impl.notificationService.NotifyAdminUserOnSaveTask(ctx, task)
+	go impl.notificationService.NotifyAdminUserOnSaveTask(ctx, task, task.UserID)
 
 	ctx.JSON(http.StatusCreated, dto.TaskResponse{Data: impl.ParseTaskDto(task)})
 }
