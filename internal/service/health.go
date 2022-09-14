@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/viniosilva/swordhealth-api/internal/repository"
 )
@@ -22,5 +23,10 @@ func NewHealthService(healthRepository repository.HealthRepository) HealthServic
 }
 
 func (impl *healthService) Health(ctx context.Context) error {
-	return impl.healthRepository.Health(ctx)
+	err := impl.healthRepository.Health(ctx)
+	if err != nil {
+		fmt.Println("internal.service.health.health.error: ", err.Error())
+	}
+
+	return err
 }

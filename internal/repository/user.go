@@ -19,12 +19,12 @@ type userRepository struct {
 }
 
 func NewUserRepository(db *sqlx.DB) UserRepository {
-	return &userRepository{
+	return &taskRepository{
 		db: db,
 	}
 }
 
-func (impl *userRepository) CreateUser(ctx context.Context, data dto.CreateUserDto) (*model.User, error) {
+func (impl *taskRepository) CreateUser(ctx context.Context, data dto.CreateUserDto) (*model.User, error) {
 	now := time.Now()
 
 	res, err := impl.db.ExecContext(ctx, `INSERT INTO users

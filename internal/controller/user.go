@@ -32,10 +32,9 @@ func NewUserController(router *gin.RouterGroup, userService service.UserService)
 }
 
 func (impl *userController) CreateUser(ctx *gin.Context) {
-	var data dto.CreateUserDto
-
 	impl.RegisterValidationUserEnum()
 
+	var data dto.CreateUserDto
 	err := ctx.ShouldBindJSON(&data)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, dto.ApiError{Error: exception.FormatBindingErrors(err)})

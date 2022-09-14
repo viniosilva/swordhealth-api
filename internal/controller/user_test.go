@@ -123,9 +123,9 @@ func TestUserControllerCreateUser(t *testing.T) {
 			json.Unmarshal(res.Body.Bytes(), &errorBody)
 
 			// then
-			assert.Equal(t, res.Result().StatusCode, cs.expectedStatusCode)
-			assert.Equal(t, body, cs.expectedBody)
-			assert.Equal(t, errorBody, cs.expectedErrorBody)
+			assert.Equal(t, cs.expectedStatusCode, res.Result().StatusCode)
+			assert.Equal(t, cs.expectedBody, body)
+			assert.Equal(t, cs.expectedErrorBody, errorBody)
 		})
 	}
 }

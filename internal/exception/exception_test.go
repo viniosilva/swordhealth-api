@@ -44,7 +44,7 @@ func TestErrorFormatBindingErrors(t *testing.T) {
 			errors := exception.FormatBindingErrors(cs.inputError)
 
 			// then
-			assert.Equal(t, errors, cs.expectedErrors)
+			assert.Equal(t, cs.expectedErrors, errors)
 		})
 	}
 }

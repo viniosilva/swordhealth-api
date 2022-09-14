@@ -44,7 +44,7 @@ func TestHealthServiceHealth(t *testing.T) {
 			err := healthService.Health(ctx)
 
 			// then
-			assert.Equal(t, err, cs.expectedErr)
+			assert.Equal(t, cs.expectedErr, err)
 		})
 	}
 }

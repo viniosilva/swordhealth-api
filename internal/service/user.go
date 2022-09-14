@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/viniosilva/swordhealth-api/internal/dto"
 	"github.com/viniosilva/swordhealth-api/internal/model"
@@ -30,6 +31,7 @@ func (impl *userService) CreateUser(ctx context.Context, data dto.CreateUserDto)
 
 	user, err := impl.userRepository.CreateUser(ctx, data)
 	if err != nil {
+		fmt.Println("internal.service.user.createuser.error: ", err.Error())
 		return nil, err
 	}
 

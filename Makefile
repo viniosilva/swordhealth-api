@@ -19,4 +19,4 @@ test/cov:
 	go tool cover -html=coverage.out
 
 migrate:
-	migrate -database ${MYSQL_URL} -path db/migrations up
+	migrate -database ${MIGRATE_URL} -path db/migrations up

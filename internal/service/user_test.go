@@ -85,8 +85,8 @@ func TestUserServiceCreateUser(t *testing.T) {
 			user, err := userService.CreateUser(ctx, cs.inputData)
 
 			// then
-			assert.Equal(t, err, cs.expectedErr)
-			assert.Equal(t, user, cs.expectedUser)
+			assert.Equal(t, cs.expectedErr, err)
+			assert.Equal(t, cs.expectedUser, user)
 		})
 	}
 }

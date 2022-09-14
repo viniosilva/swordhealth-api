@@ -25,12 +25,15 @@ func main() {
 
 	healthRepository := repository.NewHealthRepository(db)
 	userRepository := repository.NewUserRepository(db)
+	taskRepository := repository.NewTaskRepository(db)
 
 	healthService := service.NewHealthService(healthRepository)
 	userService := service.NewUserService(userRepository)
+	taskService := service.NewTaskService(taskRepository)
 
 	controller.NewHealthController(router, healthService)
 	controller.NewUserController(router, userService)
+	controller.NewTaskController(router, taskService)
 
 	r.Run(fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port))
 }

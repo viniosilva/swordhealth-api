@@ -59,8 +59,8 @@ func TestHealthControllerHealth(t *testing.T) {
 			json.Unmarshal(res.Body.Bytes(), &body)
 
 			// then
-			assert.Equal(t, res.Result().StatusCode, cs.expectedStatusCode)
-			assert.Equal(t, body, cs.expectedBody)
+			assert.Equal(t, cs.expectedStatusCode, res.Result().StatusCode)
+			assert.Equal(t, cs.expectedBody, body)
 		})
 	}
 }
