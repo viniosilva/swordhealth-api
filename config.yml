@@ -10,4 +10,4 @@ mysql:
 
 service:
   notification:
-    summaryLength: 30
+    summary_length: 30

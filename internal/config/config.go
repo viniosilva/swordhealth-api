@@ -8,30 +8,30 @@ import (
 )
 
 type ServerConfig struct {
-	Host string
-	Port string
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
 }
 
 type MySQLConfig struct {
-	Username string
-	Password string
-	Host     string
-	Port     string
-	Database string
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Database string `mapstructure:"database"`
 }
 
 type NotificationService struct {
-	SummaryLength int
+	SummaryLength int `mapstructure:"summary_length"`
 }
 
 type Service struct {
-	Notification NotificationService
+	Notification NotificationService `mapstructure:"notification"`
 }
 
 type Config struct {
-	Server  ServerConfig
-	MySQL   MySQLConfig
-	Service Service
+	Server  ServerConfig `mapstructure:"server"`
+	MySQL   MySQLConfig  `mapstructure:"mysql"`
+	Service Service      `mapstructure:"service"`
 }
 
 func LoadConfig() Config {
