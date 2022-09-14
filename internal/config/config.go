@@ -20,9 +20,18 @@ type MySQLConfig struct {
 	Database string
 }
 
+type NotificationService struct {
+	SummaryLength int
+}
+
+type Service struct {
+	Notification NotificationService
+}
+
 type Config struct {
-	Server ServerConfig
-	MySQL  MySQLConfig
+	Server  ServerConfig
+	MySQL   MySQLConfig
+	Service Service
 }
 
 func LoadConfig() Config {

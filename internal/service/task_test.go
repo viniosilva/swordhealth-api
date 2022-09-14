@@ -117,3 +117,91 @@ func BenchmarkTaskServiceCreateTask(b *testing.B) {
 		})
 	}
 }
+
+func TestTaskServiceListTasks(t *testing.T) {
+	now := time.Now()
+	task := model.Task{
+		ID:        1,
+		CreatedAt: now,
+		UpdatedAt: now,
+		UserID:    1,
+		Summary:   "summary",
+		Status:    model.TaskStatusOpened,
+	}
+
+	var cases = map[string]struct {
+		inputLimit    int
+		inputOffset   int
+		mocking       func(taskRepository *mock.MockTaskRepository)
+		expectedTasks []model.Task
+		expectedTotal int
+		expectedErr   error
+	}{
+		"should list tasks": {
+			inputLimit:  10,
+			inputOffset: 0,
+			mocking: func(taskRepository *mock.MockTaskRepository) {
+				taskRepository.EXPECT().ListTasks(gomock.Any(), gomock.Any(), gomock.Any()).Return([]model.Task{task}, 1, nil)
+			},
+			expectedTasks: []model.Task{task},
+			expectedTotal: 1,
+		},
+		"should throw error when task repository create task": {
+			inputLimit:  10,
+			inputOffset: 0,
+			mocking: func(taskRepository *mock.MockTaskRepository) {
+				taskRepository.EXPECT().ListTasks(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, 0, fmt.Errorf("error"))
+			},
+			expectedErr: fmt.Errorf("error"),
+		},
+	}
+	for name, cs := range cases {
+		t.Run(name, func(t *testing.T) {
+			// given
+			ctx := context.Background()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			taskRepositoryMock := mock.NewMockTaskRepository(ctrl)
+			taskService := service.NewTaskService(taskRepositoryMock)
+
+			cs.mocking(taskRepositoryMock)
+
+			// when
+			tasks, total, err := taskService.ListTasks(ctx, cs.inputLimit, cs.inputOffset)
+
+			// then
+			assert.Equal(t, cs.expectedErr, err)
+			assert.Equal(t, cs.expectedTasks, tasks)
+			assert.Equal(t, cs.expectedTotal, total)
+		})
+	}
+}
+
+func BenchmarkTaskServiceListTasks(b *testing.B) {
+	// given
+	ctx := context.Background()
+	ctrl := gomock.NewController(b)
+	defer ctrl.Finish()
+
+	taskRepositoryMock := mock.NewMockTaskRepository(ctrl)
+	taskService := service.NewTaskService(taskRepositoryMock)
+
+	now := time.Now()
+	tasks := []model.Task{{
+		ID:        1,
+		CreatedAt: now,
+		UpdatedAt: now,
+		UserID:    1,
+		Summary:   "summary",
+		Status:    model.TaskStatusOpened,
+	}}
+
+	taskRepositoryMock.EXPECT().ListTasks(gomock.Any(), gomock.Any(), gomock.Any()).
+		AnyTimes().Return(tasks, 1, nil)
+
+	// when
+	for i := 0; i < b.N; i++ {
+		taskService.ListTasks(ctx, 10, 0)
+	}
+}

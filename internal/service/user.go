@@ -31,7 +31,9 @@ func (impl *userService) CreateUser(ctx context.Context, data dto.CreateUserDto)
 
 	user, err := impl.userRepository.CreateUser(ctx, data)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err.Error()}).Error("internal.service.user.createuser")
+		log.WithFields(log.Fields{
+			"trace": "internal.service.user.createuser",
+		}).Error(err.Error())
 		return nil, err
 	}
 

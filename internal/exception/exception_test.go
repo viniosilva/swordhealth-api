@@ -12,7 +12,7 @@ import (
 	"github.com/viniosilva/swordhealth-api/internal/exception"
 )
 
-func TestErrorFormatBindingErrors(t *testing.T) {
+func TestExceptionFormatBindingErrors(t *testing.T) {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("enum", func(fl validator.FieldLevel) bool { return true })
 	}
@@ -49,7 +49,7 @@ func TestErrorFormatBindingErrors(t *testing.T) {
 	}
 }
 
-func BenchmarkErrorFormatBindingErrors(b *testing.B) {
+func BenchmarkExceptionFormatBindingErrors(b *testing.B) {
 	// given
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("enum", func(fl validator.FieldLevel) bool { return true })
@@ -64,5 +64,26 @@ func BenchmarkErrorFormatBindingErrors(b *testing.B) {
 	// when
 	for i := 0; i < b.N; i++ {
 		exception.FormatBindingErrors(inputErrors)
+	}
+}
+
+func TestExceptionForeignKeyConstraintException(t *testing.T) {
+	var cases = map[string]struct {
+		inputErrorMessage    string
+		expectedErrorMessage string
+	}{
+		"should return error message": {
+			inputErrorMessage:    "error",
+			expectedErrorMessage: "error",
+		},
+	}
+	for name, cs := range cases {
+		t.Run(name, func(t *testing.T) {
+			// when
+			error := exception.ForeignKeyConstraintException{Message: cs.inputErrorMessage}
+
+			// then
+			assert.Equal(t, cs.expectedErrorMessage, error.Error())
+		})
 	}
 }

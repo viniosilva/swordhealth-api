@@ -24,7 +24,7 @@ func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
 	c := config.LoadConfig()
-	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@(%s:%s)/%s",
+	db, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true",
 		c.MySQL.Username, c.MySQL.Password, c.MySQL.Host, c.MySQL.Port, c.MySQL.Database))
 	if err != nil {
 		panic(err)
@@ -40,10 +40,11 @@ func main() {
 	healthService := service.NewHealthService(healthRepository)
 	userService := service.NewUserService(userRepository)
 	taskService := service.NewTaskService(taskRepository)
+	notificationService := service.NewNotificationService(userRepository, c.Service.Notification.SummaryLength)
 
 	controller.NewHealthController(router, healthService)
 	controller.NewUserController(router, userService)
-	controller.NewTaskController(router, taskService)
+	controller.NewTaskController(router, taskService, notificationService)
 
 	host := fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port)
 	docs.SwaggerInfo.Host = host

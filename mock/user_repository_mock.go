@@ -11,6 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	dto "github.com/viniosilva/swordhealth-api/internal/dto"
 	model "github.com/viniosilva/swordhealth-api/internal/model"
+	repository "github.com/viniosilva/swordhealth-api/internal/repository"
 )
 
 // MockUserRepository is a mock of UserRepository interface.
@@ -49,4 +50,25 @@ func (m *MockUserRepository) CreateUser(arg0 context.Context, arg1 dto.CreateUse
 func (mr *MockUserRepositoryMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), arg0, arg1)
+}
+
+// ListUsers mocks base method.
+func (m *MockUserRepository) ListUsers(arg0 context.Context, arg1, arg2 int, arg3 ...repository.WhereOpt) ([]model.User, int, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1, arg2}
+	for _, a := range arg3 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListUsers", varargs...)
+	ret0, _ := ret[0].([]model.User)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ListUsers indicates an expected call of ListUsers.
+func (mr *MockUserRepositoryMockRecorder) ListUsers(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockUserRepository)(nil).ListUsers), varargs...)
 }
