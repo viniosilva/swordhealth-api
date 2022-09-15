@@ -1,5 +1,10 @@
 basePath: /api
 definitions:
+  dto.ApiError:
+    properties:
+      error:
+        type: string
+    type: object
   dto.AuthLoginResponse:
     properties:
       access_token:
@@ -132,6 +137,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.AuthLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ApiError'
       security:
       - BasicAuth: []
       summary: login
@@ -175,8 +188,16 @@ paths:
                 $ref: '#/definitions/dto.TasksResponse'
               type: array
             type: array
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ApiError'
       security:
-      - ApiKeyAuth: []
+      - JwtAuth: []
       summary: list tasks
       tags:
       - task
@@ -197,8 +218,20 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/dto.TaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ApiError'
       security:
-      - ApiKeyAuth: []
+      - JwtAuth: []
       summary: create task
       tags:
       - task
@@ -220,14 +253,32 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/dto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ApiError'
+      security:
+      - JwtAuth: []
       summary: create user
       tags:
       - user
 securityDefinitions:
-  ApiKeyAuth:
+  BasicAuth:
+    type: basic
+  JwtAuth:
     in: header
     name: authorization
     type: apiKey
-  BasicAuth:
-    type: basic
 swagger: "2.0"

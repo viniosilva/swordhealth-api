@@ -41,9 +41,12 @@ func NewTaskController(router *gin.RouterGroup, taskService service.TaskService,
 // @Tags task
 // @Accept json
 // @Produce json
-// @Security ApiKeyAuth
+// @Security JwtAuth
 // @Param request body dto.CreateTaskDto true "task"
 // @Success 201 {object} dto.TaskResponse
+// @Failure 400 {object} dto.ApiError
+// @Failure 403 {object} dto.ApiError
+// @Failure 500 {object} dto.ApiError
 // @Router /tasks [post]
 func (impl *taskController) CreateTask(ctx *gin.Context) {
 	var data dto.CreateTaskDto
@@ -77,10 +80,12 @@ func (impl *taskController) CreateTask(ctx *gin.Context) {
 // @Tags task
 // @Accept json
 // @Produce json
-// @Security ApiKeyAuth
+// @Security JwtAuth
 // @Param limit query int false "limit"
 // @Param offset query int false "offset"
 // @Success 200 {array} []dto.TasksResponse
+// @Failure 403 {object} dto.ApiError
+// @Failure 500 {object} dto.ApiError
 // @Router /tasks [get]
 func (impl *taskController) ListTasks(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.Query("limit"))

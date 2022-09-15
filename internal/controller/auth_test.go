@@ -59,7 +59,7 @@ func TestAuthControllerLogin(t *testing.T) {
 				Error: "invalid basic auth",
 			},
 		},
-		"should throw forbidden error on get user by username and password": {
+		"should throw forbidden exception on get user by username and password": {
 			inputBasicAuth: "Basic dXNlcm5hbWU6MTEyMjMzNDQ1NQ==",
 			mocking: func(authService *mock.MockAuthService, userService *mock.MockUserService, cryptoService *mock.MockCryptoService) {
 				authService.EXPECT().DecodeBasicAuth(gomock.Any(), gomock.Any()).Return("username", "1122334455", nil)

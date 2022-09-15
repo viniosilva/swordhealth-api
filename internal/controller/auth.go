@@ -39,6 +39,8 @@ func NewAuthController(router *gin.RouterGroup, authService service.AuthService,
 // @Produce json
 // @Security BasicAuth
 // @Success 200 {object} dto.AuthLoginResponse
+// @Failure 400 {object} dto.ApiError
+// @Failure 403 {object} dto.ApiError
 // @Router /auth/login [post]
 func (impl *authController) Login(ctx *gin.Context) {
 	username, password, err := impl.authService.DecodeBasicAuth(ctx, ctx.Request.Header.Get("Authorization"))

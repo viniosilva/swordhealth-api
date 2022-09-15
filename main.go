@@ -21,7 +21,7 @@ import (
 // @description     Task manager test
 // @BasePath /api
 // @securityDefinitions.basic BasicAuth
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey JwtAuth
 // @in header
 // @name authorization
 func main() {
@@ -51,7 +51,7 @@ func main() {
 	middleware := controller.NewMiddlewareController(cryptoService)
 
 	controller.NewHealthController(router, healthService)
-	controller.NewUserController(router, userService, cryptoService)
+	controller.NewUserController(router, userService, cryptoService, middleware.AccessToken, middleware.UserManager)
 	controller.NewTaskController(router, taskService, userService, notificationService, middleware.AccessToken)
 	controller.NewAuthController(router, authService, userService, cryptoService)
 

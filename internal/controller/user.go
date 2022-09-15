@@ -22,13 +22,14 @@ type userController struct {
 	cryptoService service.CryptoService
 }
 
-func NewUserController(router *gin.RouterGroup, userService service.UserService, cryptoService service.CryptoService) UserController {
+func NewUserController(router *gin.RouterGroup, userService service.UserService, cryptoService service.CryptoService,
+	middlewareAccessToken, middlewareUserManager func(ctx *gin.Context)) UserController {
 	impl := &userController{
 		userService:   userService,
 		cryptoService: cryptoService,
 	}
 
-	router.POST("/users", impl.CreateUser)
+	router.POST("/users", middlewareAccessToken, middlewareUserManager, impl.CreateUser)
 
 	return impl
 }
@@ -38,8 +39,13 @@ func NewUserController(router *gin.RouterGroup, userService service.UserService,
 // @Tags user
 // @Accept json
 // @Produce json
+// @Security JwtAuth
 // @Param request body dto.CreateUserDto true "user"
 // @Success 201 {object} dto.UserResponse
+// @Failure 400 {object} dto.ApiError
+// @Failure 401 {object} dto.ApiError
+// @Failure 403 {object} dto.ApiError
+// @Failure 500 {object} dto.ApiError
 // @Router /users [post]
 func (impl *userController) CreateUser(ctx *gin.Context) {
 	impl.RegisterValidationUserEnum()

@@ -7,11 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/viniosilva/swordhealth-api/internal/dto"
+	"github.com/viniosilva/swordhealth-api/internal/model"
 	"github.com/viniosilva/swordhealth-api/internal/service"
 )
 
 type MiddlewareController interface {
 	AccessToken(ctx *gin.Context)
+	UserManager(ctx *gin.Context)
 }
 
 type middlewareController struct {
@@ -44,6 +46,17 @@ func (impl *middlewareController) AccessToken(ctx *gin.Context) {
 
 	for k, v := range claims {
 		ctx.Params = append(ctx.Params, gin.Param{Key: k, Value: fmt.Sprint(v)})
+	}
+
+	ctx.Next()
+}
+
+func (impl *middlewareController) UserManager(ctx *gin.Context) {
+	role, _ := ctx.Params.Get("role")
+	if role != string(model.UserRoleManager) {
+		ctx.JSON(http.StatusUnauthorized, dto.ApiError{Error: "unauthorized user role"})
+		ctx.Abort()
+		return
 	}
 
 	ctx.Next()

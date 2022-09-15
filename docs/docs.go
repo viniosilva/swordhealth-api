@@ -39,6 +39,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.AuthLoginResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
                     }
                 }
             }
@@ -69,7 +81,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "JwtAuth": []
                     }
                 ],
                 "consumes": [
@@ -108,13 +120,25 @@ const docTemplate = `{
                                 }
                             }
                         }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
                     }
                 }
             },
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "JwtAuth": []
                     }
                 ],
                 "consumes": [
@@ -144,12 +168,35 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.TaskResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
                     }
                 }
             }
         },
         "/users": {
             "post": {
+                "security": [
+                    {
+                        "JwtAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -177,12 +224,44 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.UserResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiError"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
+        "dto.ApiError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AuthLoginResponse": {
             "type": "object",
             "properties": {
@@ -347,13 +426,13 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "BasicAuth": {
+            "type": "basic"
+        },
+        "JwtAuth": {
             "type": "apiKey",
             "name": "authorization",
             "in": "header"
-        },
-        "BasicAuth": {
-            "type": "basic"
         }
     }
 }`

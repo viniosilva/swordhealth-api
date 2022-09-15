@@ -112,7 +112,7 @@ func TestUserControllerCreateUser(t *testing.T) {
 
 			userServiceMock := mock.NewMockUserService(ctrl)
 			cryptoServiceMock := mock.NewMockCryptoService(ctrl)
-			userController := controller.NewUserController(r.Group("/api"), userServiceMock, cryptoServiceMock)
+			userController := controller.NewUserController(r.Group("/api"), userServiceMock, cryptoServiceMock, nil, nil)
 
 			cs.mocking(userServiceMock, cryptoServiceMock)
 

@@ -12,10 +12,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/viniosilva/swordhealth-api/internal/controller"
 	"github.com/viniosilva/swordhealth-api/internal/dto"
+	"github.com/viniosilva/swordhealth-api/internal/model"
 	"github.com/viniosilva/swordhealth-api/mock"
 )
 
-func TestMiddlewareControllerHealth(t *testing.T) {
+func TestMiddlewareControllerAccessToken(t *testing.T) {
 	var cases = map[string]struct {
 		inputAuthorization  string
 		mocking             func(cryptoService *mock.MockCryptoService)
@@ -76,6 +77,49 @@ func TestMiddlewareControllerHealth(t *testing.T) {
 
 			// then
 			assert.Equal(t, cs.expectedUserIDParam, userIDParam)
+			assert.Equal(t, cs.expectedStatusCode, res.Result().StatusCode)
+			assert.Equal(t, cs.expectedErrorBody, errorBody)
+		})
+	}
+}
+
+func TestMiddlewareControllerHealth(t *testing.T) {
+	var cases = map[string]struct {
+		inputRole          model.UserRole
+		expectedStatusCode int
+		expectedErrorBody  dto.ApiError
+	}{
+		"should next": {
+			inputRole:          model.UserRoleManager,
+			expectedStatusCode: http.StatusOK,
+		},
+		"should throw unauthorized exception when user role is not manager": {
+			inputRole:          model.UserRoleTechnician,
+			expectedStatusCode: http.StatusUnauthorized,
+			expectedErrorBody:  dto.ApiError{Error: "unauthorized user role"},
+		},
+	}
+	for name, cs := range cases {
+		t.Run(name, func(t *testing.T) {
+			// given
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			gin.SetMode(gin.TestMode)
+			res := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(res)
+			ctx.Request = httptest.NewRequest("GET", "/api/healthcheck", nil)
+			ctx.Params = append(ctx.Params, gin.Param{Key: "role", Value: string(cs.inputRole)})
+
+			middlewareController := controller.NewMiddlewareController(nil)
+
+			// when
+			middlewareController.UserManager(ctx)
+
+			var errorBody dto.ApiError
+			json.Unmarshal(res.Body.Bytes(), &errorBody)
+
+			// then
 			assert.Equal(t, cs.expectedStatusCode, res.Result().StatusCode)
 			assert.Equal(t, cs.expectedErrorBody, errorBody)
 		})
