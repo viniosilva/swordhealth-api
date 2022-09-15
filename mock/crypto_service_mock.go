@@ -5,6 +5,7 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -31,6 +32,36 @@ func NewMockCryptoService(ctrl *gomock.Controller) *MockCryptoService {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCryptoService) EXPECT() *MockCryptoServiceMockRecorder {
 	return m.recorder
+}
+
+// DecryptJwt mocks base method.
+func (m *MockCryptoService) DecryptJwt(arg0 context.Context, arg1 string) (map[string]interface{}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DecryptJwt", arg0, arg1)
+	ret0, _ := ret[0].(map[string]interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DecryptJwt indicates an expected call of DecryptJwt.
+func (mr *MockCryptoServiceMockRecorder) DecryptJwt(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptJwt", reflect.TypeOf((*MockCryptoService)(nil).DecryptJwt), arg0, arg1)
+}
+
+// EncryptJwt mocks base method.
+func (m *MockCryptoService) EncryptJwt(arg0 context.Context, arg1 interface{}, arg2 map[string]interface{}) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EncryptJwt", arg0, arg1, arg2)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// EncryptJwt indicates an expected call of EncryptJwt.
+func (mr *MockCryptoServiceMockRecorder) EncryptJwt(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncryptJwt", reflect.TypeOf((*MockCryptoService)(nil).EncryptJwt), arg0, arg1, arg2)
 }
 
 // Hash mocks base method.

@@ -67,6 +67,21 @@ func (mr *MockUserRepositoryMockRecorder) GetUserByID(arg0, arg1 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockUserRepository)(nil).GetUserByID), arg0, arg1)
 }
 
+// GetUserByUsernameAndPassword mocks base method.
+func (m *MockUserRepository) GetUserByUsernameAndPassword(arg0 context.Context, arg1, arg2 string) (*model.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByUsernameAndPassword", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserByUsernameAndPassword indicates an expected call of GetUserByUsernameAndPassword.
+func (mr *MockUserRepositoryMockRecorder) GetUserByUsernameAndPassword(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByUsernameAndPassword", reflect.TypeOf((*MockUserRepository)(nil).GetUserByUsernameAndPassword), arg0, arg1, arg2)
+}
+
 // ListUsers mocks base method.
 func (m *MockUserRepository) ListUsers(arg0 context.Context, arg1, arg2 int, arg3 ...repository.WhereOpt) ([]model.User, int, error) {
 	m.ctrl.T.Helper()

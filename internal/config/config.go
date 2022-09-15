@@ -14,14 +14,16 @@ type ServerConfig struct {
 
 type MySQLConfig struct {
 	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
+	Password string
 	Host     string `mapstructure:"host"`
 	Port     string `mapstructure:"port"`
 	Database string `mapstructure:"database"`
 }
 
 type Crypto struct {
-	Key string `mapstructure:"key"`
+	HashKey   string
+	JwtKey    string
+	ExpiresIn int64 `mapstructure:"expires_in"`
 }
 
 type Config struct {
@@ -47,7 +49,8 @@ func LoadConfig() Config {
 	}
 
 	configuration.MySQL.Password = os.Getenv("MYSQL_PASSWORD")
-	configuration.Crypto.Key = os.Getenv("CRYPTO_KEY")
+	configuration.Crypto.HashKey = os.Getenv("CRYPTO_KEY")
+	configuration.Crypto.JwtKey = os.Getenv("JWT_KEY")
 
 	return configuration
 }

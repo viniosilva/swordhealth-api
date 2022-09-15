@@ -28,7 +28,7 @@ func NewTaskService(taskRepository repository.TaskRepository) TaskService {
 func (impl *taskService) CreateTask(ctx context.Context, data dto.CreateTaskDto) (*model.Task, error) {
 	task, err := impl.taskRepository.CreateTask(ctx, data)
 	if err != nil {
-		log.WithFields(log.Fields{
+		log.WithContext(ctx).WithFields(log.Fields{
 			"trace": "internal.service.task.createtask",
 		}).Error(err.Error())
 	}
@@ -39,7 +39,7 @@ func (impl *taskService) CreateTask(ctx context.Context, data dto.CreateTaskDto)
 func (impl *taskService) ListTasks(ctx context.Context, limit, offset int) ([]model.Task, int, error) {
 	tasks, total, err := impl.taskRepository.ListTasks(ctx, limit, offset)
 	if err != nil {
-		log.WithFields(log.Fields{
+		log.WithContext(ctx).WithFields(log.Fields{
 			"trace": "internal.service.task.listtasks",
 		}).Error(err.Error())
 	}

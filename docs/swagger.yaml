@@ -1,5 +1,11 @@
 basePath: /api
 definitions:
+  dto.AuthLoginResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
   dto.CreateTaskDto:
     properties:
       summary:
@@ -72,6 +78,19 @@ definitions:
       data:
         $ref: '#/definitions/dto.TaskDto'
     type: object
+  dto.TasksResponse:
+    properties:
+      count:
+        example: 1
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/dto.TaskDto'
+        type: array
+      total:
+        example: 1
+        type: integer
+    type: object
   dto.UserDto:
     properties:
       created_at:
@@ -107,6 +126,22 @@ info:
   title: Sword Health API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthLoginResponse'
+      security:
+      - BasicAuth: []
+      summary: login
+      tags:
+      - auth
   /healthcheck:
     get:
       consumes:
@@ -122,6 +157,30 @@ paths:
       tags:
       - health
   /tasks:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: task
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTaskDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/dto.TasksResponse'
+              type: array
+            type: array
+      summary: list tasks
+      tags:
+      - task
     post:
       consumes:
       - application/json
@@ -163,4 +222,7 @@ paths:
       summary: create user
       tags:
       - user
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"

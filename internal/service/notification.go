@@ -27,14 +27,14 @@ func NewNotificationService(userRepository repository.UserRepository) Notificati
 func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, task *model.Task, actionUserID int) error {
 	actionUser, err := impl.userRepository.GetUserByID(ctx, actionUserID)
 	if err != nil {
-		log.WithFields(log.Fields{
+		log.WithContext(ctx).WithFields(log.Fields{
 			"trace": "internal.service.notification.notifyadminuseronsavetask",
 		}).Error(err.Error())
 		return err
 	}
 
 	if actionUser.Role == model.UserRoleManager {
-		log.WithFields(log.Fields{
+		log.WithContext(ctx).WithFields(log.Fields{
 			"trace": "internal.service.notification.notifyadminuseronsavetask",
 		}).Info("does not notify when user is manager")
 
@@ -43,7 +43,7 @@ func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, 
 
 	users, _, err := impl.userRepository.ListUsers(ctx, 0, 0, repository.SetWhere("WHERE role = ?", []interface{}{model.UserRoleManager}))
 	if err != nil {
-		log.WithFields(log.Fields{
+		log.WithContext(ctx).WithFields(log.Fields{
 			"trace": "internal.service.notification.notifyadminuseronsavetask",
 		}).Error(err.Error())
 		return err
@@ -56,7 +56,7 @@ func (impl *notificationService) NotifyAdminUserOnSaveTask(ctx context.Context, 
 	)
 
 	for _, u := range users {
-		log.WithFields(log.Fields{
+		log.WithContext(ctx).WithFields(log.Fields{
 			"trace": "internal.service.notification.notifyadminuseronsavetask",
 			"user": map[string]interface{}{
 				"id":       u.ID,

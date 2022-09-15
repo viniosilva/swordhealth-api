@@ -18,12 +18,14 @@ type UserController interface {
 }
 
 type userController struct {
-	userService service.UserService
+	userService   service.UserService
+	cryptoService service.CryptoService
 }
 
-func NewUserController(router *gin.RouterGroup, userService service.UserService) UserController {
+func NewUserController(router *gin.RouterGroup, userService service.UserService, cryptoService service.CryptoService) UserController {
 	impl := &userController{
-		userService: userService,
+		userService:   userService,
+		cryptoService: cryptoService,
 	}
 
 	router.POST("/users", impl.CreateUser)
@@ -49,6 +51,7 @@ func (impl *userController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	data.Password = impl.cryptoService.Hash(data.Password)
 	user, err := impl.userService.CreateUser(ctx, data)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, dto.ApiError{Error: "internal server error"})

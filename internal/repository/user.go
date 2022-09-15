@@ -15,6 +15,7 @@ import (
 type UserRepository interface {
 	CreateUser(ctx context.Context, data dto.CreateUserDto) (*model.User, error)
 	GetUserByID(ctx context.Context, id int) (*model.User, error)
+	GetUserByUsernameAndPassword(ctx context.Context, username, password string) (*model.User, error)
 	ListUsers(ctx context.Context, limit, offset int, opts ...WhereOpt) ([]model.User, int, error)
 }
 
@@ -68,6 +69,29 @@ func (impl *userRepository) GetUserByID(ctx context.Context, id int) (*model.Use
 		WHERE id = ?
 	`
 	err := impl.db.SelectContext(ctx, &users, query, id)
+
+	if len(users) == 0 {
+		return nil, &exception.NotFoundException{Message: "user not found"}
+	}
+
+	return &users[0], err
+}
+
+func (impl *userRepository) GetUserByUsernameAndPassword(ctx context.Context, username, password string) (*model.User, error) {
+	var users []model.User
+	query := `
+		SELECT id,
+			created_at,
+			updated_at,
+			username,
+			email,
+			password,
+			role
+		FROM users
+		WHERE username = ?
+			AND password = ?
+	`
+	err := impl.db.SelectContext(ctx, &users, query, username, password)
 
 	if len(users) == 0 {
 		return nil, &exception.NotFoundException{Message: "user not found"}

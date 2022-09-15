@@ -32,7 +32,7 @@ func TestUserControllerCreateUser(t *testing.T) {
 
 	var cases = map[string]struct {
 		inputPayload       string
-		mocking            func(userService *mock.MockUserService)
+		mocking            func(userService *mock.MockUserService, cryptoService *mock.MockCryptoService)
 		expectedStatusCode int
 		expectedBody       dto.UserResponse
 		expectedErrorBody  dto.ApiError
@@ -43,7 +43,8 @@ func TestUserControllerCreateUser(t *testing.T) {
 				"email": "email@email.com",
 				"password": "1122334455"
 			}`,
-			mocking: func(userService *mock.MockUserService) {
+			mocking: func(userService *mock.MockUserService, cryptoService *mock.MockCryptoService) {
+				cryptoService.EXPECT().Hash(gomock.Any()).Return("aabbccddee")
 				userService.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(user, nil)
 			},
 			expectedStatusCode: http.StatusCreated,
@@ -63,7 +64,7 @@ func TestUserControllerCreateUser(t *testing.T) {
 				"password": "a",
 				"role": "unknown"
 			}`,
-			mocking:            func(userService *mock.MockUserService) {},
+			mocking:            func(userService *mock.MockUserService, cryptoService *mock.MockCryptoService) {},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedErrorBody:  dto.ApiError{Error: "invalid payload"},
 		},
@@ -74,7 +75,7 @@ func TestUserControllerCreateUser(t *testing.T) {
 				"password": "a",
 				"role": "unknown"
 			}`,
-			mocking:            func(userService *mock.MockUserService) {},
+			mocking:            func(userService *mock.MockUserService, cryptoService *mock.MockCryptoService) {},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedErrorBody: dto.ApiError{Error: strings.Join([]string{
 				"Key: 'CreateUserDto.Username' Error:Field validation for 'Username' failed on the 'min' tag",
@@ -90,7 +91,8 @@ func TestUserControllerCreateUser(t *testing.T) {
 				"password": "1122334455",
 				"role": "technician"
 			}`,
-			mocking: func(userService *mock.MockUserService) {
+			mocking: func(userService *mock.MockUserService, cryptoService *mock.MockCryptoService) {
+				cryptoService.EXPECT().Hash(gomock.Any()).Return("aabbccddee")
 				userService.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("error"))
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -109,9 +111,10 @@ func TestUserControllerCreateUser(t *testing.T) {
 			ctx.Request = httptest.NewRequest("POST", "/api/users", strings.NewReader(cs.inputPayload))
 
 			userServiceMock := mock.NewMockUserService(ctrl)
-			userController := controller.NewUserController(r.Group("/api"), userServiceMock)
+			cryptoServiceMock := mock.NewMockCryptoService(ctrl)
+			userController := controller.NewUserController(r.Group("/api"), userServiceMock, cryptoServiceMock)
 
-			cs.mocking(userServiceMock)
+			cs.mocking(userServiceMock, cryptoServiceMock)
 
 			// when
 			userController.CreateUser(ctx)
