@@ -18,17 +18,20 @@ type TaskController interface {
 
 type taskController struct {
 	taskService         service.TaskService
+	userService         service.UserService
 	notificationService service.NotificationService
 }
 
-func NewTaskController(router *gin.RouterGroup, taskService service.TaskService, notificationService service.NotificationService) TaskController {
+func NewTaskController(router *gin.RouterGroup, taskService service.TaskService, userService service.UserService, notificationService service.NotificationService,
+	middlewareAccessToken func(ctx *gin.Context)) TaskController {
 	impl := &taskController{
 		taskService:         taskService,
+		userService:         userService,
 		notificationService: notificationService,
 	}
 
-	router.POST("/tasks", impl.CreateTask)
-	router.GET("/tasks", impl.ListTasks)
+	router.POST("/tasks", middlewareAccessToken, impl.CreateTask)
+	router.GET("/tasks", middlewareAccessToken, impl.ListTasks)
 
 	return impl
 }
@@ -38,6 +41,7 @@ func NewTaskController(router *gin.RouterGroup, taskService service.TaskService,
 // @Tags task
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param request body dto.CreateTaskDto true "task"
 // @Success 201 {object} dto.TaskResponse
 // @Router /tasks [post]
@@ -49,7 +53,10 @@ func (impl *taskController) CreateTask(ctx *gin.Context) {
 		return
 	}
 
-	task, err := impl.taskService.CreateTask(ctx, data)
+	paramUserID, _ := ctx.Params.Get("sub")
+	userID, _ := strconv.Atoi(paramUserID)
+
+	task, err := impl.taskService.CreateTask(ctx, userID, data.Summary)
 	if err != nil {
 		if _, ok := err.(*exception.ForeignKeyConstraintException); ok {
 			ctx.JSON(http.StatusBadRequest, dto.ApiError{Error: err.Error()})
@@ -70,7 +77,9 @@ func (impl *taskController) CreateTask(ctx *gin.Context) {
 // @Tags task
 // @Accept json
 // @Produce json
-// @Param request body dto.CreateTaskDto true "task"
+// @Security ApiKeyAuth
+// @Param limit query int false "limit"
+// @Param offset query int false "offset"
 // @Success 200 {array} []dto.TasksResponse
 // @Router /tasks [get]
 func (impl *taskController) ListTasks(ctx *gin.Context) {
@@ -83,7 +92,16 @@ func (impl *taskController) ListTasks(ctx *gin.Context) {
 		offset = 0
 	}
 
-	tasks, total, err := impl.taskService.ListTasks(ctx, limit, offset)
+	paramUserID, _ := ctx.Params.Get("sub")
+	userID, _ := strconv.Atoi(paramUserID)
+
+	user, err := impl.userService.GetUserByID(ctx, userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, dto.ApiError{Error: "internal server error"})
+		return
+	}
+
+	tasks, total, err := impl.taskService.ListTasks(ctx, limit, offset, user)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, dto.ApiError{Error: "internal server error"})
 		return

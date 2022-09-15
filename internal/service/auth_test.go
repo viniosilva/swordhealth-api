@@ -23,13 +23,13 @@ func TestAuthServiceLogin(t *testing.T) {
 			expectedUsername: "username",
 			expectedPassword: "1122334455",
 		},
-		"should throw invalid basic auth error": {
+		"should throw invalid authorization error": {
 			inputBasicAuth: "auth",
-			expectedErr:    fmt.Errorf("invalid basic auth"),
+			expectedErr:    fmt.Errorf("invalid authorization"),
 		},
 		"should throw error on decode auth": {
 			inputBasicAuth: "Basic ",
-			expectedErr:    fmt.Errorf("invalid basic auth"),
+			expectedErr:    fmt.Errorf("invalid authorization"),
 		},
 	}
 	for name, cs := range cases {

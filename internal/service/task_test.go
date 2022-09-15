@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/viniosilva/swordhealth-api/internal/dto"
 	"github.com/viniosilva/swordhealth-api/internal/exception"
 	"github.com/viniosilva/swordhealth-api/internal/model"
 	"github.com/viniosilva/swordhealth-api/internal/service"
@@ -27,39 +26,34 @@ func TestTaskServiceCreateTask(t *testing.T) {
 	}
 
 	var cases = map[string]struct {
-		inputData    dto.CreateTaskDto
+		inputUserID  int
+		inputSummary string
 		mocking      func(taskRepository *mock.MockTaskRepository)
 		expectedTask *model.Task
 		expectedErr  error
 	}{
 		"should create task": {
-			inputData: dto.CreateTaskDto{
-				UserID:  task.UserID,
-				Summary: task.Summary,
-			},
+			inputUserID:  task.UserID,
+			inputSummary: task.Summary,
 			mocking: func(taskRepository *mock.MockTaskRepository) {
-				taskRepository.EXPECT().CreateTask(gomock.Any(), gomock.Any()).Return(task, nil)
+				taskRepository.EXPECT().CreateTask(gomock.Any(), gomock.Any(), gomock.Any()).Return(task, nil)
 			},
 			expectedTask: task,
 		},
 		"should throw foreign key constraint exception when user not found": {
-			inputData: dto.CreateTaskDto{
-				UserID:  task.UserID,
-				Summary: task.Summary,
-			},
+			inputUserID:  task.UserID,
+			inputSummary: task.Summary,
 			mocking: func(taskRepository *mock.MockTaskRepository) {
-				taskRepository.EXPECT().CreateTask(gomock.Any(), gomock.Any()).
+				taskRepository.EXPECT().CreateTask(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil, &exception.ForeignKeyConstraintException{Message: "user not found"})
 			},
 			expectedErr: &exception.ForeignKeyConstraintException{Message: "user not found"},
 		},
 		"should throw error when task repository create task": {
-			inputData: dto.CreateTaskDto{
-				UserID:  task.UserID,
-				Summary: task.Summary,
-			},
+			inputUserID:  task.UserID,
+			inputSummary: task.Summary,
 			mocking: func(taskRepository *mock.MockTaskRepository) {
-				taskRepository.EXPECT().CreateTask(gomock.Any(), gomock.Any()).
+				taskRepository.EXPECT().CreateTask(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil, fmt.Errorf("error"))
 			},
 			expectedErr: fmt.Errorf("error"),
@@ -78,7 +72,7 @@ func TestTaskServiceCreateTask(t *testing.T) {
 			cs.mocking(taskRepositoryMock)
 
 			// when
-			task, err := taskService.CreateTask(ctx, cs.inputData)
+			task, err := taskService.CreateTask(ctx, cs.inputUserID, cs.inputSummary)
 
 			// then
 			assert.Equal(t, cs.expectedErr, err)
@@ -106,15 +100,12 @@ func BenchmarkTaskServiceCreateTask(b *testing.B) {
 		Status:    model.TaskStatusOpened,
 	}
 
-	taskRepositoryMock.EXPECT().CreateTask(gomock.Any(), gomock.Any()).
+	taskRepositoryMock.EXPECT().CreateTask(gomock.Any(), gomock.Any(), gomock.Any()).
 		AnyTimes().Return(task, nil)
 
 	// when
 	for i := 0; i < b.N; i++ {
-		taskService.CreateTask(ctx, dto.CreateTaskDto{
-			UserID:  task.ID,
-			Summary: task.Summary,
-		})
+		taskService.CreateTask(ctx, task.UserID, task.Summary)
 	}
 }
 
@@ -132,6 +123,7 @@ func TestTaskServiceListTasks(t *testing.T) {
 	var cases = map[string]struct {
 		inputLimit    int
 		inputOffset   int
+		inputUser     *model.User
 		mocking       func(taskRepository *mock.MockTaskRepository)
 		expectedTasks []model.Task
 		expectedTotal int
@@ -140,15 +132,36 @@ func TestTaskServiceListTasks(t *testing.T) {
 		"should list tasks": {
 			inputLimit:  10,
 			inputOffset: 0,
+			inputUser: &model.User{
+				ID:   1,
+				Role: model.UserRoleManager,
+			},
 			mocking: func(taskRepository *mock.MockTaskRepository) {
 				taskRepository.EXPECT().ListTasks(gomock.Any(), gomock.Any(), gomock.Any()).Return([]model.Task{task}, 1, nil)
 			},
 			expectedTasks: []model.Task{task},
 			expectedTotal: 1,
 		},
-		"should throw error when task repository create task": {
+		"should list tasks when user is not manager": {
 			inputLimit:  10,
 			inputOffset: 0,
+			inputUser: &model.User{
+				ID:   1,
+				Role: model.UserRoleTechnician,
+			},
+			mocking: func(taskRepository *mock.MockTaskRepository) {
+				taskRepository.EXPECT().ListTasks(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]model.Task{task}, 1, nil)
+			},
+			expectedTasks: []model.Task{task},
+			expectedTotal: 1,
+		},
+		"should throw error when task repository list tasks": {
+			inputLimit:  10,
+			inputOffset: 0,
+			inputUser: &model.User{
+				ID:   1,
+				Role: model.UserRoleManager,
+			},
 			mocking: func(taskRepository *mock.MockTaskRepository) {
 				taskRepository.EXPECT().ListTasks(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, 0, fmt.Errorf("error"))
 			},
@@ -168,7 +181,7 @@ func TestTaskServiceListTasks(t *testing.T) {
 			cs.mocking(taskRepositoryMock)
 
 			// when
-			tasks, total, err := taskService.ListTasks(ctx, cs.inputLimit, cs.inputOffset)
+			tasks, total, err := taskService.ListTasks(ctx, cs.inputLimit, cs.inputOffset, cs.inputUser)
 
 			// then
 			assert.Equal(t, cs.expectedErr, err)
@@ -202,6 +215,9 @@ func BenchmarkTaskServiceListTasks(b *testing.B) {
 
 	// when
 	for i := 0; i < b.N; i++ {
-		taskService.ListTasks(ctx, 10, 0)
+		taskService.ListTasks(ctx, 10, 0, &model.User{
+			ID:   1,
+			Role: model.UserRoleManager,
+		})
 	}
 }

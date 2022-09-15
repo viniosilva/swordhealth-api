@@ -67,6 +67,11 @@ const docTemplate = `{
         },
         "/tasks": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -79,13 +84,16 @@ const docTemplate = `{
                 "summary": "list tasks",
                 "parameters": [
                     {
-                        "description": "task",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateTaskDto"
-                        }
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -104,6 +112,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -182,8 +195,7 @@ const docTemplate = `{
         "dto.CreateTaskDto": {
             "type": "object",
             "required": [
-                "summary",
-                "user_id"
+                "summary"
             ],
             "properties": {
                 "summary": {
@@ -191,11 +203,6 @@ const docTemplate = `{
                     "maxLength": 2500,
                     "minLength": 1,
                     "example": "summary"
-                },
-                "user_id": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "example": 1
                 }
             }
         },
@@ -340,6 +347,11 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "authorization",
+            "in": "header"
+        },
         "BasicAuth": {
             "type": "basic"
         }

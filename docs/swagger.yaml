@@ -13,13 +13,8 @@ definitions:
         maxLength: 2500
         minLength: 1
         type: string
-      user_id:
-        example: 1
-        minimum: 1
-        type: integer
     required:
     - summary
-    - user_id
     type: object
   dto.CreateUserDto:
     properties:
@@ -161,12 +156,14 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: task
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateTaskDto'
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -178,6 +175,8 @@ paths:
                 $ref: '#/definitions/dto.TasksResponse'
               type: array
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: list tasks
       tags:
       - task
@@ -198,6 +197,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/dto.TaskResponse'
+      security:
+      - ApiKeyAuth: []
       summary: create task
       tags:
       - task
@@ -223,6 +224,10 @@ paths:
       tags:
       - user
 securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: authorization
+    type: apiKey
   BasicAuth:
     type: basic
 swagger: "2.0"

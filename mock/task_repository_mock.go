@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	dto "github.com/viniosilva/swordhealth-api/internal/dto"
 	model "github.com/viniosilva/swordhealth-api/internal/model"
+	repository "github.com/viniosilva/swordhealth-api/internal/repository"
 )
 
 // MockTaskRepository is a mock of TaskRepository interface.
@@ -37,24 +37,28 @@ func (m *MockTaskRepository) EXPECT() *MockTaskRepositoryMockRecorder {
 }
 
 // CreateTask mocks base method.
-func (m *MockTaskRepository) CreateTask(arg0 context.Context, arg1 dto.CreateTaskDto) (*model.Task, error) {
+func (m *MockTaskRepository) CreateTask(arg0 context.Context, arg1 int, arg2 string) (*model.Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTask", arg0, arg1)
+	ret := m.ctrl.Call(m, "CreateTask", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*model.Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateTask indicates an expected call of CreateTask.
-func (mr *MockTaskRepositoryMockRecorder) CreateTask(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) CreateTask(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskRepository)(nil).CreateTask), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskRepository)(nil).CreateTask), arg0, arg1, arg2)
 }
 
 // ListTasks mocks base method.
-func (m *MockTaskRepository) ListTasks(arg0 context.Context, arg1, arg2 int) ([]model.Task, int, error) {
+func (m *MockTaskRepository) ListTasks(arg0 context.Context, arg1, arg2 int, arg3 ...repository.WhereOpt) ([]model.Task, int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListTasks", arg0, arg1, arg2)
+	varargs := []interface{}{arg0, arg1, arg2}
+	for _, a := range arg3 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListTasks", varargs...)
 	ret0, _ := ret[0].([]model.Task)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
@@ -62,7 +66,8 @@ func (m *MockTaskRepository) ListTasks(arg0 context.Context, arg1, arg2 int) ([]
 }
 
 // ListTasks indicates an expected call of ListTasks.
-func (mr *MockTaskRepositoryMockRecorder) ListTasks(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) ListTasks(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockTaskRepository)(nil).ListTasks), arg0, arg1, arg2)
+	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockTaskRepository)(nil).ListTasks), varargs...)
 }

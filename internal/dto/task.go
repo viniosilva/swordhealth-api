@@ -23,6 +23,5 @@ type TasksResponse struct {
 }
 
 type CreateTaskDto struct {
-	UserID  int    `json:"user_id" binding:"required,min=1" example:"1"`
 	Summary string `json:"summary" binding:"required,min=1,max=2500" example:"summary"`
 }

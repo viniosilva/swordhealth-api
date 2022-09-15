@@ -8,5 +8,5 @@ mysql:
   port: '3306'
   database: 'swordhealth'
 
-jwt:
+crypto:
   expires_in: 900000

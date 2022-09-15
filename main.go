@@ -19,10 +19,11 @@ import (
 // @title           Sword Health API
 // @version         1.0
 // @description     Task manager test
+// @BasePath /api
 // @securityDefinitions.basic BasicAuth
+// @securityDefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
-// @BasePath  /api
+// @name authorization
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
@@ -47,9 +48,11 @@ func main() {
 	notificationService := service.NewNotificationService(userRepository)
 	authService := service.NewAuthService()
 
+	middleware := controller.NewMiddlewareController(cryptoService)
+
 	controller.NewHealthController(router, healthService)
 	controller.NewUserController(router, userService, cryptoService)
-	controller.NewTaskController(router, taskService, notificationService)
+	controller.NewTaskController(router, taskService, userService, notificationService, middleware.AccessToken)
 	controller.NewAuthController(router, authService, userService, cryptoService)
 
 	host := fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port)

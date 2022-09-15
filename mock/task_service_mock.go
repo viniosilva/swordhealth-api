@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	dto "github.com/viniosilva/swordhealth-api/internal/dto"
 	model "github.com/viniosilva/swordhealth-api/internal/model"
 )
 
@@ -37,24 +36,24 @@ func (m *MockTaskService) EXPECT() *MockTaskServiceMockRecorder {
 }
 
 // CreateTask mocks base method.
-func (m *MockTaskService) CreateTask(arg0 context.Context, arg1 dto.CreateTaskDto) (*model.Task, error) {
+func (m *MockTaskService) CreateTask(arg0 context.Context, arg1 int, arg2 string) (*model.Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTask", arg0, arg1)
+	ret := m.ctrl.Call(m, "CreateTask", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*model.Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateTask indicates an expected call of CreateTask.
-func (mr *MockTaskServiceMockRecorder) CreateTask(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockTaskServiceMockRecorder) CreateTask(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskService)(nil).CreateTask), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskService)(nil).CreateTask), arg0, arg1, arg2)
 }
 
 // ListTasks mocks base method.
-func (m *MockTaskService) ListTasks(arg0 context.Context, arg1, arg2 int) ([]model.Task, int, error) {
+func (m *MockTaskService) ListTasks(arg0 context.Context, arg1, arg2 int, arg3 *model.User) ([]model.Task, int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListTasks", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "ListTasks", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].([]model.Task)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
@@ -62,7 +61,7 @@ func (m *MockTaskService) ListTasks(arg0 context.Context, arg1, arg2 int) ([]mod
 }
 
 // ListTasks indicates an expected call of ListTasks.
-func (mr *MockTaskServiceMockRecorder) ListTasks(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockTaskServiceMockRecorder) ListTasks(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockTaskService)(nil).ListTasks), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockTaskService)(nil).ListTasks), arg0, arg1, arg2, arg3)
 }

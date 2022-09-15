@@ -21,7 +21,7 @@ func NewAuthService() AuthService {
 func (impl *authService) DecodeBasicAuth(ctx context.Context, authorization string) (string, string, error) {
 	splitedBasicAuth := strings.Split(authorization, " ")
 	if strings.ToLower(splitedBasicAuth[0]) != "basic" || len(splitedBasicAuth) != 2 {
-		return "", "", fmt.Errorf("invalid basic auth")
+		return "", "", fmt.Errorf("invalid authorization")
 	}
 
 	basicAuth := splitedBasicAuth[1]
@@ -29,7 +29,7 @@ func (impl *authService) DecodeBasicAuth(ctx context.Context, authorization stri
 
 	auth := strings.Split(string(decodedBasicAuth), ":")
 	if len(auth) != 2 {
-		return "", "", fmt.Errorf("invalid basic auth")
+		return "", "", fmt.Errorf("invalid authorization")
 	}
 
 	return auth[0], auth[1], nil
