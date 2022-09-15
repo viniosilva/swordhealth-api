@@ -49,8 +49,8 @@ func LoadConfig() Config {
 	}
 
 	configuration.MySQL.Password = os.Getenv("MYSQL_PASSWORD")
-	configuration.Crypto.HashKey = os.Getenv("CRYPTO_KEY")
-	configuration.Crypto.JwtKey = os.Getenv("JWT_KEY")
+	configuration.Crypto.HashKey = os.Getenv("CRYPTO_HASH_KEY")
+	configuration.Crypto.JwtKey = os.Getenv("CRYPTO_JWT_KEY")
 
 	return configuration
 }

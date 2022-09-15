@@ -56,7 +56,7 @@ require (
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
-	golang.org/x/exp v0.0.0-20220914170420-dc92f8653013
+	golang.org/x/exp v0.0.0-20220915105810-2d61f44442a3
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
 	golang.org/x/sys v0.0.0-20220913175220-63ea55921009 // indirect
 	golang.org/x/text v0.3.7 // indirect
